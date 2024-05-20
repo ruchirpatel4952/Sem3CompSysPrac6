@@ -1,5 +1,0 @@
-// Main.vm
-// Main entry point for the VM programs
-
-function Main.main 0
-call Abs.main 0
