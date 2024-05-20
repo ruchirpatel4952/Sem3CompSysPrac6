@@ -1,6 +1,7 @@
 // Test file for Abs.vm
 // Second test case
 
+load Sys.vm,
 load Abs.vm,
 output-file Abs01.out,
 compare-to Abs01.cmp,

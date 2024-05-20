@@ -1,6 +1,7 @@
 // Test file for AddSub.vm
 // Second test case
 
+load Sys.vm,
 load AddSub.vm,
 output-file AddSub01.out,
 compare-to AddSub01.cmp,

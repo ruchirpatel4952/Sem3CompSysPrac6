@@ -2,6 +2,7 @@
 // Follows the Test Scripting Language format described in 
 // Appendix B of the book "The Elements of Computing Systems"
 
+load Sys.vm,
 load AddSub.vm,
 output-file AddSub00.out,
 compare-to AddSub00.cmp,
