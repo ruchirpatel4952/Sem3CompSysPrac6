@@ -1,0 +1,3 @@
+// popTest01.vm
+push constant 10
+pop local 0
