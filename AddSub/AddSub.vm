@@ -1,0 +1,14 @@
+// Calculates x = (a + b) - x
+// a & b are local variables
+// x is a static variable
+
+function Main.main 2 // Declare the function with 2 local variables
+push local 0        // Push the value of a
+push local 1        // Push the value of b
+add                 // Add a and b
+push static 0       // Push the value of x
+sub                 // Subtract x from (a + b)
+pop static 0        // Store the result in x
+
+label END
+goto END
