@@ -34,6 +34,7 @@ class VMTranslator:
             raise ValueError("Invalid segment for pop command")
 
 
+
     def vm_add():
         '''Generate Hack Assembly code for a VM add operation'''
         return ""
