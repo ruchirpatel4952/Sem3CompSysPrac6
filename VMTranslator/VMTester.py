@@ -1,4 +1,3 @@
-# Import the VMTranslator class
 from VMTranslator import VMTranslator
 
 # Create an instance of VMTranslator
