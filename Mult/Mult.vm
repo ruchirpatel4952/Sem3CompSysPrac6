@@ -1,0 +1,35 @@
+// Calculates a = x*y
+// a is a local variable
+// x & y are static variables
+
+function Mult.main 1 // Declare the function with 1 local variable
+push constant 0       // 1
+pop local 0           // 1
+push static 0         // 1
+push static 1         // 1
+
+label LOOP_START
+push static 1         // 1
+push constant 0       // 1
+eq                    // 1
+if-goto END_LOOP      // 1
+
+push local 0          // 1
+push static 0         // 1
+add                   // 1
+pop local 0           // 1
+
+push static 1         // 1
+push constant 1       // 1
+sub                   // 1
+pop static 1          // 1
+
+goto LOOP_START       // 1
+
+label END_LOOP
+// Store the result in the static variable for verification
+push local 0          // 1
+pop static 2          // 1
+
+label END
+goto END

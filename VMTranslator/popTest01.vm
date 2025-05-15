@@ -1,0 +1,3 @@
+// popTest02.vm
+push constant 20
+pop argument 1

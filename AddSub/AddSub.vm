@@ -1,0 +1,16 @@
+// Calculates x = (a + b) - x
+// a & b are local variables
+// x is a static variable
+
+LOAD a       
+ADD b        
+STORE temp   
+LOAD temp    
+SUB x        
+STORE x      
+
+label END
+goto END
+
+label END
+goto END
