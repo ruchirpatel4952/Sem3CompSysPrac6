@@ -1,14 +1,19 @@
-// Abs.vm
 // Calculates y = |x|
 // x & y are static variables
 
-function Abs.main 0
-push static 0        // Push the value of x onto the stack
-dup                  // Duplicate the top value (x)
-if-goto POSITIVE     // If x >= 0, jump to POSITIVE
-neg                  // Negate x to get -x
-label POSITIVE
-pop static 1         // Store the result in y
+push static 0 // push x onto the stack
+push constant 0 // push 0 onto the stack
+lt // compare x < 0
+if-goto NEGATIVE // if x < 0, jump to NEGATIVE
+push static 0 // push x onto the stack
+goto SET_Y // jump to SET_Y
+
+label NEGATIVE
+push static 0 // push x onto the stack
+neg // negate x
+
+label SET_Y
+pop static 1 // pop the top of the stack into y
 
 label END
 goto END
