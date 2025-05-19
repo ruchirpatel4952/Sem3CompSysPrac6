@@ -15,6 +15,8 @@ function ArrMax.arrMax 2
     // Initialize max value with first element
     push argument 0     // Base address of array
     push 0              // Index 0
+    push constant 1
+    call Math.multiply  // Multiply by word size (assuming word size is 1)
     add                 // Calculate address of a[0]
     pop pointer 1       // Set THAT to point to a[0]
     push that 0         // Get value at a[0]
@@ -27,28 +29,26 @@ LOOP:
     // Check if we've processed all elements
     push local 1        // i
     push argument 1     // b (array length)
-    eq                  // i == b?
-    if-goto DONE        // If equal, we're done
+    lt                  // i < b? (changed from eq to lt)
+    not                 // invert to check if i >= b
+    if-goto DONE        // If i >= b, we're done
     
     // Load current array element a[i]
     push argument 0     // Base address of array
     push local 1        // i
+    push constant 1
+    call Math.multiply  // Multiply by word size (assuming word size is 1)
     add                 // Calculate address of a[i]
     pop pointer 1       // Set THAT to point to a[i]
     push that 0         // Get value at a[i]
     
     // Compare with current max
     push local 0        // max
-    gt                  // a[i] > max?
-    not
-    if-goto NOT_BIGGER  // If a[i] <= max, don't update
+    lt                  // a[i] < max? (changed from gt to lt)
+    if-goto NOT_BIGGER  // If a[i] < max, don't update
     
     // Update max if current element is larger
-    push argument 0     // Base address of array
-    push local 1        // i
-    add                 // Calculate address of a[i]
-    pop pointer 1       // Set THAT to point to a[i]
-    push that 0         // Get value at a[i]
+    // (No need to access the array again since we already have the value on the stack)
     pop local 0         // max = a[i]
     
 NOT_BIGGER:
