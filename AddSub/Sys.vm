@@ -1,5 +1,0 @@
-// Sys.vm
-// Initialization function for the VM
-
-function Sys.init 0
-call Main.main 0
