@@ -1,32 +1,50 @@
-// Assume x = static 0, y = static 1
-// local 0 will be used as a = x * y
+// ------------------------------------------------------------
+// Mult.vm
+//   Computes  a = x * y
+//
+//   Inputs (supplied by the test-harness):
+//     static 0   x
+//     static 1   y
+//
+//   Locals:
+//     local 0   a  (running product)
+//     local 1   i  (loop counter)
+//
+//   Returns the product as the function’s return value as well.
+// ------------------------------------------------------------
 
-function Mult.main 1   // 1 local var: a
-push constant 0
-pop local 0            // a = 0
+function Mult.mul 2        // product & loop-counter
 
-// Load y into temp 0 as counter
-push static 1
-pop temp 0             // temp 0 = y
+    // ----- initialise ---------------------------------------
+    push constant 0        // a ← 0
+    pop  local 0
 
-label LOOP_START
-push temp 0
-push constant 0
-eq
-if-goto END_LOOP       // if y == 0, done
+    push static 1          // i ← y   (don’t destroy static 1)
+    pop  local 1
 
-// a = a + x
-push local 0
-push static 0
-add
-pop local 0            // store result in a
+    // ----- repeated-addition loop ---------------------------
+    // while (i > 0) { a += x ; i-- }
+    label LOOP_START
+        push local 1
+        push constant 0
+        eq
+        if-goto LOOP_END    // i == 0 ? break
 
-// y--
-push temp 0
-push constant 1
-sub
-pop temp 0             // decrement y
+        // a = a + x
+        push local 0
+        push static 0
+        add                 // a + x
+        pop  local 0
 
-goto LOOP_START
+        // i--
+        push local 1
+        push constant 1
+        sub
+        pop  local 1
 
-label END_LOOP
+        goto LOOP_START
+    label LOOP_END
+
+    // ----- return a ----------------------------------------
+    push local 0
+    return

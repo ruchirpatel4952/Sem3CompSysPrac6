@@ -1,13 +1,15 @@
-// Calculates x = (a + b) - x
-// a & b are local variables
-// x is a static variable
+function AddSub.calc 0    // no extra local variables
 
-LOAD a       
-ADD b        
-STORE temp   
-LOAD temp    
-SUB x        
-STORE x      
+    // ---  (a + b)  ---
+    push local 0          // push a
+    push local 1          // push b
+    add                   // (a + b)
 
-label END
-goto END
+    // ---  subtract old x  ---
+    push static 0         // (a + b)   old-x
+    sub                   // (a + b) - x
+
+    // ---  store result in x and return it ---
+    pop  static 0         // x ← (a + b) - x
+    push static 0         // leave result on stack for caller
+    return
