@@ -1,15 +1,16 @@
-function AddSub.calc 0    // no extra local variables
+// AddSub.vm
+// Load a into D
+@a
+D=M
 
-    // ---  (a + b)  ---
-    push local 0          // push a
-    push local 1          // push b
-    add                   // (a + b)
+// Add b to D
+@b
+D=D+M
 
-    // ---  subtract old x  ---
-    push static 0         // (a + b)   old-x
-    sub                   // (a + b) - x
+// Subtract x from D
+@x
+D=D-M
 
-    // ---  store result in x and return it ---
-    pop  static 0         // x ← (a + b) - x
-    push static 0         // leave result on stack for caller
-    return
+// Store the result in x
+@x
+M=D
