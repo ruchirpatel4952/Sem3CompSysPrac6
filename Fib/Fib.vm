@@ -1,8 +1,5 @@
-// Contains a function Fib.fib that calculates and returns the nth Fibonacci number recursively
-// n is supplied as an argument
-
-// Put your code here.
-
+// Function: Fib.fib
+// Calculates the nth Fibonacci number recursively
 function Fib.fib 0
 
 // if n == 0 return 0
@@ -17,25 +14,25 @@ push constant 1
 eq
 if-goto BASE_CASE_1
 
-// Recursive: Fib(n - 1)
+// Fib(n-1)
 push argument 0
 push constant 1
 sub
 call Fib.fib 1    // returns Fib(n-1)
 
-// Save return value in temp 0
-pop temp 0
+// Save Fib(n-1) on stack
 
-// Recursive: Fib(n - 2)
+// Fib(n-2)
 push argument 0
 push constant 2
 sub
 call Fib.fib 1    // returns Fib(n-2)
 
-// Add temp 0 + Fib(n-2)
-push temp 0
-add
+// At this point:
+// Top of stack: Fib(n-2)
+// Below it: Fib(n-1)
 
+add             // Fib(n-1) + Fib(n-2)
 return
 
 label BASE_CASE_0
