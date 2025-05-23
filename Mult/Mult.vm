@@ -1,80 +1,79 @@
 // ------------------------------------------------------------
-// Mult.vm   —  computes  a = x * y
+// Mult.mul  –  compute a = x * y
 //
-// Inputs
-//      static 0   x
-//      static 1   y
+// Inputs (static):
+//   static 0  x
+//   static 1  y
 //
-// Locals
-//      0   a          (running product)
-//      1   cnt        (abs(y) – loop counter)
-//      2   sx         (sign bit of x : 0 / 1)
-//      3   sy         (sign bit of y : 0 / 1)
-//      4   sneg       (1 if result should be negative, else 0)
-//
-// No built-in Math.multiply is used.
-// The function returns the product (so the test harness can see it).
+// Locals (5):
+//   0  a     – running product
+//   1  cnt   – |y| loop counter
+//   2  sx    – sign(x)  (1 if negative)
+//   3  sy    – sign(y)
+//   4  sneg  – 1 if result must be negative
 // ------------------------------------------------------------
 
-function Mult.mul 5          // 5 locals declared
+function Mult.mul 5          // declare 5 locals
 
-// ---------- initialise --------------------------------------
-push constant 0
-pop   local 0                // a ← 0
-push constant 0
-pop   local 2                // sx ← 0
-pop   local 3                // sy ← 0
-pop   local 4                // sneg ← 0   (will be set later)
+// ---------- zero-initialise locals --------------------------
+push constant 0   // a
+pop  local 0
+push constant 0   // cnt  (will set later)
+pop  local 1
+push constant 0   // sx
+pop  local 2
+push constant 0   // sy
+pop  local 3
+push constant 0   // sneg
+pop  local 4
 
-// ---------- |x|  and sign(x) --------------------------------
-push static 0                // x
+// ---------- |x|  &  sign(x) ---------------------------------
+push static 0
 push constant 0
-lt                           // x < 0 ?
+lt                     // x < 0 ?
 if-goto X_NEG
     // x ≥ 0
     push static 0
-    pop   temp 0             // |x|
+    pop  temp 0        // |x|
     goto  CHECK_Y
 label X_NEG
     push constant 1
-    pop   local 2            // sx ← 1
+    pop  local 2       // sx ← 1
     push static 0
-    neg                      // |x|
-    pop   temp 0
+    neg
+    pop  temp 0        // |x|
 label CHECK_Y
 
-// ---------- |y|  and sign(y) --------------------------------
-push static 1                // y
+// ---------- |y|  &  sign(y) ---------------------------------
+push static 1
 push constant 0
-lt                           // y < 0 ?
+lt                     // y < 0 ?
 if-goto Y_NEG
     // y ≥ 0
     push static 1
-    pop   temp 1             // |y|
-    goto  SIGN_FLAG
+    pop  temp 1        // |y|
+    goto  SIGN_DONE
 label Y_NEG
     push constant 1
-    pop   local 3            // sy ← 1
+    pop  local 3       // sy ← 1
     push static 1
-    neg                      // |y|
-    pop   temp 1
-label SIGN_FLAG
+    neg
+    pop  temp 1        // |y|
+label SIGN_DONE
 
 // ---------- result sign : sx XOR sy -------------------------
 push local 2
 push local 3
-add                          // 0,1,2
+add                    // 0,1,2
 push constant 1
-eq                           // -1 ↔ XOR true
+eq                     // true ↔ exactly one sign bit set
 if-goto NEG_RESULT
-    // positive product
-    push constant 0
-    pop   local 4
-    goto  INIT_LOOP
+    // positive result
+    goto SIGN_READY
 label NEG_RESULT
     push constant 1
-    pop   local 4            // sneg ← 1
-label INIT_LOOP
+    pop  local 4       // sneg ← 1
+label SIGN_READY
 
 // ---------- cnt ← |y| ---------------------------------------
 push temp 1
@@ -84,8 +83,8 @@ pop  local 1
 label LOOP_START
     push local 1
     push constant 0
-    eq                      // cnt == 0 ?
-    if-goto LOOP_END
+    eq
+    if-goto END_LOOP   // cnt == 0 → done
 
     // a = a + |x|
     push local 0
@@ -100,20 +99,20 @@ label LOOP_START
     pop  local 1
 
     goto LOOP_START
-label LOOP_END
+label END_LOOP
 
 // ---------- apply sign if needed ----------------------------
-push local 4                 // sneg ?
+push local 4           // sneg ?
 push constant 0
 eq
-if-goto RETURN_RESULT        // 0 → already positive
+if-goto RETURN_OK      // already positive
 
-    // negate the product
+    // negate product
     push local 0
     neg
     pop  local 0
-label RETURN_RESULT
+label RETURN_OK
 
-// ---------- return value ------------------------------------
-push local 0                 // a
+// ---------- return product ----------------------------------
+push local 0
 return
