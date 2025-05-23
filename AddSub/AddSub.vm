@@ -1,23 +1,18 @@
 // AddSub.vm
-// Initialize a and b as local variables
-@a
-M=0
+// calculates  x = (a + b) - x
+//   a → local 0
+//   b → local 1
+//   x → static 0
 
-@b
-M=0
+function AddSub.calc 0   // <-- VM function header
 
-// Load a into D
-@a
-D=M
+    push local 0         // a
+    push local 1         // b
+    add                  // a + b
 
-// Add b to D
-@b
-D=D+M
+    push static 0        // x
+    sub                  // (a + b) - x
 
-// Subtract x from D
-@x
-D=D-M
-
-// Store the result in x
-@x
-M=D
+    pop  static 0        // store result back in x
+    push static 0        // leave it on the stack as return value
+    return
