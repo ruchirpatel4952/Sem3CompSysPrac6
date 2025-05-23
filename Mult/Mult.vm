@@ -1,41 +1,32 @@
-// Calculates a = x*y
-// a is a local variable
-// x & y are static variables
+// Assume x = static 0, y = static 1
+// local 0 will be used as a = x * y
 
-function Mult.main 1 // Declare the function with 1 local variable
-    // Initialize a = 0
-    push constant 0
-    pop local 0
-    
-    // Check if y is 0 before entering the loop
-    push static 1     // y
-    push constant 0
-    eq
-    if-goto END_LOOP
-    
+function Mult.main 1   // 1 local var: a
+push constant 0
+pop local 0            // a = 0
+
+// Load y into temp 0 as counter
+push static 1
+pop temp 0             // temp 0 = y
+
 label LOOP_START
-    // Add x to a
-    push local 0      // a
-    push static 0     // x
-    add
-    pop local 0       // a = a + x
-    
-    // Decrement y
-    push static 1     // y
-    push constant 1
-    sub
-    pop static 1      // y = y - 1
-    
-    // Continue loop if y > 0
-    push static 1
-    push constant 0
-    gt                // y > 0?
-    if-goto LOOP_START
-    
+push temp 0
+push constant 0
+eq
+if-goto END_LOOP       // if y == 0, done
+
+// a = a + x
+push local 0
+push static 0
+add
+pop local 0            // store result in a
+
+// y--
+push temp 0
+push constant 1
+sub
+pop temp 0             // decrement y
+
+goto LOOP_START
+
 label END_LOOP
-    // Store the result in the static variable for verification
-    push local 0      // final value of a
-    pop static 2      // store in static 2
-    
-label END
-goto END

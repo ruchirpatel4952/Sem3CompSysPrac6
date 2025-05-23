@@ -1,69 +1,58 @@
-// Contains a function ArrMax.arrMax that finds and returns the largest element in the array a of length b.
-// a & b are both supplied as arguments
+function ArrMax.arrMax 0
 
-function ArrMax.arrMax 2
-    // Input parameters:
-    // argument 0 = pointer to array a
-    // argument 1 = length b
-    
-    // Edge case: if length is 0, return 0
-    push argument 1
-    push 0
-    eq
-    if-goto RETURN_ZERO
-    
-    // Initialize max value with first element
-    push argument 0     // Base address of array
-    push 0              // Index 0
-    push constant 1
-    call Math.multiply  // Multiply by word size (assuming word size is 1)
-    add                 // Calculate address of a[0]
-    pop pointer 1       // Set THAT to point to a[0]
-    push that 0         // Get value at a[0]
-    pop local 0         // local 0 = max value
-    
-    push 1              // i = 1
-    pop local 1         // local 1 = i
-    
-LOOP:
-    // Check if we've processed all elements
-    push local 1        // i
-    push argument 1     // b (array length)
-    lt                  // i < b? (changed from eq to lt)
-    not                 // invert to check if i >= b
-    if-goto DONE        // If i >= b, we're done
-    
-    // Load current array element a[i]
-    push argument 0     // Base address of array
-    push local 1        // i
-    push constant 1
-    call Math.multiply  // Multiply by word size (assuming word size is 1)
-    add                 // Calculate address of a[i]
-    pop pointer 1       // Set THAT to point to a[i]
-    push that 0         // Get value at a[i]
-    
-    // Compare with current max
-    push local 0        // max
-    lt                  // a[i] < max? (changed from gt to lt)
-    if-goto NOT_BIGGER  // If a[i] < max, don't update
-    
-    // Update max if current element is larger
-    // (No need to access the array again since we already have the value on the stack)
-    pop local 0         // max = a[i]
-    
-NOT_BIGGER:
-    // Increment loop counter
-    push local 1
-    push 1
-    add               // i++
-    pop local 1
-    goto LOOP         // Continue loop
-    
-RETURN_ZERO:
-    push 0
-    return            // Return 0 for empty array
+// Set THAT to base address of array (m)
+push argument 0
+pop pointer 1
 
-DONE:
-    // Return the max value
-    push local 0
-    return
+// i = 0 (we'll start from first element)
+push that 0
+// Store max in temp 0
+pop temp 0
+
+// Set i = 1
+push constant 1
+pop local 0   // local 0 will act as i
+
+label LOOP_START
+  // if i >= n, end loop
+  push local 0
+  push argument 1
+  lt
+  not
+  if-goto LOOP_END
+
+  // Load array[i]
+  push local 0
+  push pointer 1
+  add
+  pop pointer 1
+  push that 0
+
+  // Compare with max
+  push temp 0
+  gt
+  if-goto UPDATE_MAX
+
+  goto CONTINUE
+
+label UPDATE_MAX
+  // array[i] > max, so update max
+  push that 0
+  pop temp 0
+
+label CONTINUE
+  // Restore pointer 1 to base address
+  push argument 0
+  pop pointer 1
+
+  // i++
+  push local 0
+  push constant 1
+  add
+  pop local 0
+
+  goto LOOP_START
+
+label LOOP_END
+  push temp 0
+  return

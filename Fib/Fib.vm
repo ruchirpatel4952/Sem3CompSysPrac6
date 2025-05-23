@@ -3,3 +3,45 @@
 
 // Put your code here.
 
+function Fib.fib 0
+
+// if n == 0 return 0
+push argument 0
+push constant 0
+eq
+if-goto BASE_CASE_0
+
+// if n == 1 return 1
+push argument 0
+push constant 1
+eq
+if-goto BASE_CASE_1
+
+// Recursive: Fib(n - 1)
+push argument 0
+push constant 1
+sub
+call Fib.fib 1    // returns Fib(n-1)
+
+// Save return value in temp 0
+pop temp 0
+
+// Recursive: Fib(n - 2)
+push argument 0
+push constant 2
+sub
+call Fib.fib 1    // returns Fib(n-2)
+
+// Add temp 0 + Fib(n-2)
+push temp 0
+add
+
+return
+
+label BASE_CASE_0
+push constant 0
+return
+
+label BASE_CASE_1
+push constant 1
+return
