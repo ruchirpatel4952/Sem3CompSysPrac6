@@ -1,118 +1,76 @@
-// ------------------------------------------------------------
-// Mult.mul  –  compute a = x * y
+// -----------------------------------------------------------------
+// Mult.mul   –   returns  a = x * y
 //
-// Inputs (static):
-//   static 0  x
-//   static 1  y
+// Inputs (static)
+//   static 0   x
+//   static 1   y
 //
-// Locals (5):
-//   0  a     – running product
-//   1  cnt   – |y| loop counter
-//   2  sx    – sign(x)  (1 if negative)
-//   3  sy    – sign(y)
-//   4  sneg  – 1 if result must be negative
-// ------------------------------------------------------------
+// Locals
+//   0  a    – running product
+//   1  cnt  – copy of y; drives the loop (can be ±)
+//
+// Idea
+//   while (cnt != 0)
+//        if cnt > 0 : a += x , cnt--
+//        else        : a -= x , cnt++
+//
+// This avoids taking |y|, so it also works for y = –32768.
+// -----------------------------------------------------------------
 
-function Mult.mul 5          // declare 5 locals
+function Mult.mul 2          // 2 locals: a, cnt
 
-// ---------- zero-initialise locals --------------------------
-push constant 0   // a
-pop  local 0
-push constant 0   // cnt  (will set later)
-pop  local 1
-push constant 0   // sx
-pop  local 2
-push constant 0   // sy
-pop  local 3
-push constant 0   // sneg
-pop  local 4
-
-// ---------- |x|  &  sign(x) ---------------------------------
-push static 0
-push constant 0
-lt                     // x < 0 ?
-if-goto X_NEG
-    // x ≥ 0
-    push static 0
-    pop  temp 0        // |x|
-    goto  CHECK_Y
-label X_NEG
-    push constant 1
-    pop  local 2       // sx ← 1
-    push static 0
-    neg
-    pop  temp 0        // |x|
-label CHECK_Y
-
-// ---------- |y|  &  sign(y) ---------------------------------
-push static 1
-push constant 0
-lt                     // y < 0 ?
-if-goto Y_NEG
-    // y ≥ 0
-    push static 1
-    pop  temp 1        // |y|
-    goto  SIGN_DONE
-label Y_NEG
-    push constant 1
-    pop  local 3       // sy ← 1
-    push static 1
-    neg
-    pop  temp 1        // |y|
-label SIGN_DONE
-
-// ---------- result sign : sx XOR sy -------------------------
-push local 2
-push local 3
-add                    // 0,1,2
-push constant 1
-eq                     // true ↔ exactly one sign bit set
-if-goto NEG_RESULT
-    // positive result
-    goto SIGN_READY
-label NEG_RESULT
-    push constant 1
-    pop  local 4       // sneg ← 1
-label SIGN_READY
-
-// ---------- cnt ← |y| ---------------------------------------
-push temp 1
-pop  local 1
-
-// ---------- repeated-addition loop --------------------------
-label LOOP_START
-    push local 1
+    // a ← 0
     push constant 0
-    eq
-    if-goto END_LOOP   // cnt == 0 → done
-
-    // a = a + |x|
-    push local 0
-    push temp 0
-    add
     pop  local 0
 
-    // cnt--
-    push local 1
-    push constant 1
-    sub
+    // cnt ← y       (copy of static 1)
+    push static 1
     pop  local 1
 
-    goto LOOP_START
-label END_LOOP
+    // --------------- main loop -------------------------------
+    label LOOP_START
+        // if cnt == 0 → done
+        push local 1
+        push constant 0
+        eq
+        if-goto LOOP_END
 
-// ---------- apply sign if needed ----------------------------
-push local 4           // sneg ?
-push constant 0
-eq
-if-goto RETURN_OK      // already positive
+        // if cnt < 0 ?
+        push local 1
+        push constant 0
+        lt
+        if-goto CNT_NEG
 
-    // negate product
-    push local 0
-    neg
-    pop  local 0
-label RETURN_OK
+    // ------- cnt > 0  ---------------------------------------
+        // a = a + x
+        push local 0
+        push static 0
+        add
+        pop  local 0
 
-// ---------- return product ----------------------------------
-push local 0
-return
+        // cnt--
+        push local 1
+        push constant 1
+        sub
+        pop  local 1
+        goto LOOP_START
+
+    // ------- cnt < 0  ---------------------------------------
+    label CNT_NEG
+        // a = a - x
+        push local 0
+        push static 0
+        sub
+        pop  local 0
+
+        // cnt++
+        push local 1
+        push constant 1
+        add
+        pop  local 1
+        goto LOOP_START
+
+    // --------------- finish ----------------------------------
+    label LOOP_END
+        push local 0      // return a
+        return
