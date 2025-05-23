@@ -1,34 +1,84 @@
-class VMTranslator:
-    def __init__(self):
-        self.file_name = ""
+# inside VMTranslator.py  (adjust names / placement to your codebase)
 
-    def set_file_name(self, file_name):
-        self.file_name = file_name
+SEGMENT_SYMBOLS = {
+    "local":     "LCL",
+    "argument":  "ARG",
+    "this":      "THIS",
+    "that":      "THAT",
+}
 
-    def vm_push(self, segment, index):
-        if segment == "constant":
-            return f"@{index}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
-        elif segment in ["local", "argument", "this", "that"]:
-            segment_pointer = {"local": "LCL", "argument": "ARG", "this": "THIS", "that": "THAT"}[segment]
-            return f"@{index}\nD=A\n@{segment_pointer}\nA=D+M\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
-        elif segment == "pointer":
-            return f"@{'THIS' if index == 0 else 'THAT'}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
-        elif segment == "temp":
-            return f"@{5 + index}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
-        elif segment == "static":
-            return f"@{self.file_name}.{index}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
-        else:
-            raise ValueError("Invalid segment for push command")
+TEMP_BASE    = 5
+POINTER_BASE = 3      # 0 -> THIS, 1 -> THAT
 
-    def vm_pop(self, segment, index):
-        if segment in ["local", "argument", "this", "that"]:
-            segment_pointer = {"local": "LCL", "argument": "ARG", "this": "THIS", "that": "THAT"}[segment]
-            return f"@{index}\nD=A\n@{segment_pointer}\nD=D+M\n@R13\nM=D\n@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n"
-        elif segment == "pointer":
-            return f"@SP\nAM=M-1\nD=M\n@{'THIS' if index == 0 else 'THAT'}\nM=D\n"
-        elif segment == "temp":
-            return f"@SP\nAM=M-1\nD=M\n@{5 + index}\nM=D\n"
-        elif segment == "static":
-            return f"@SP\nAM=M-1\nD=M\n@{self.file_name}.{index}\nM=D\n"
-        else:
-            raise ValueError("Invalid segment for pop command")
+def vm_push(self, segment: str, index: int, file_name: str) -> list[str]:
+    """
+    Return Hack assembly for the VM command   push segment index
+    """
+    asm = []
+
+    if segment == "constant":
+        # D = index
+        asm += [f"@{index}", "D=A"]
+
+    elif segment in SEGMENT_SYMBOLS:
+        # D = *(segmentBase + index)
+        base = SEGMENT_SYMBOLS[segment]
+        asm += [
+            f"@{base}",   "D=M",        # D = base address
+            f"@{index}",  "A=D+A",      # A = base + index
+            "D=M"                      # D = *addr
+        ]
+
+    elif segment == "temp":
+        asm += [
+            f"@{TEMP_BASE + index}", "D=M"
+        ]
+
+    elif segment == "pointer":
+        addr = POINTER_BASE + index          # 3 or 4
+        asm += [f"@{addr}", "D=M"]
+
+    elif segment == "static":
+        asm += [f"@{file_name}.{index}", "D=M"]
+
+    else:
+        raise ValueError(f"Unknown segment {segment}")
+
+    # *SP = D ;  SP++
+    asm += ["@SP", "A=M", "M=D", "@SP", "M=M+1"]
+    return asm
+# --------------------------------------------------------------------
+
+def vm_pop(self, segment: str, index: int, file_name: str) -> list[str]:
+    """
+    Return Hack assembly for the VM command   pop segment index
+    """
+    asm = []
+
+    if segment in SEGMENT_SYMBOLS:
+        base = SEGMENT_SYMBOLS[segment]
+        # Compute target address into R13
+        asm += [
+            f"@{base}",  "D=M",
+            f"@{index}", "D=D+A",
+            "@R13",      "M=D"
+        ]
+        # *SP-- ; D = *SP
+        asm += ["@SP", "AM=M-1", "D=M"]
+        # *(R13) = D
+        asm += ["@R13", "A=M", "M=D"]
+
+    elif segment == "temp":
+        asm += ["@SP", "AM=M-1", "D=M", f"@{TEMP_BASE + index}", "M=D"]
+
+    elif segment == "pointer":
+        addr = POINTER_BASE + index          # 3 or 4
+        asm += ["@SP", "AM=M-1", "D=M", f"@{addr}", "M=D"]
+
+    elif segment == "static":
+        asm += ["@SP", "AM=M-1", "D=M", f"@{file_name}.{index}", "M=D"]
+
+    else:
+        raise ValueError(f"Unknown segment {segment}")
+
+    return asm
