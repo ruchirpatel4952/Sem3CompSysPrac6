@@ -1,58 +1,74 @@
-function ArrMax.arrMax 0
+// -------------------------------------------------------------
+// ArrMax.arrMax(m, n)
+//   m : base address of the array   (argument 0)
+//   n : number of elements          (argument 1)
+//   returns: the largest element
+//
+// Implementation notes
+//   • We point THAT at m (via pointer 1) so we can read the array
+//     with   push that 0
+//   • locals[0]  – current maximum
+//     locals[1]  – loop index i   (starts at 1 because max ← arr[0])
+// -------------------------------------------------------------
 
-// Set THAT to base address of array (m)
-push argument 0
-pop pointer 1
+function ArrMax.arrMax 2      // 2 locals: max, i
 
-// i = 0 (we'll start from first element)
-push that 0
-// Store max in temp 0
-pop temp 0
+    // ---------- handle n == 0  (defensive, not required) ----
+    push argument 1
+    push constant 0
+    eq
+    if-goto RETURN_ZERO
 
-// Set i = 1
-push constant 1
-pop local 0   // local 0 will act as i
+    // ---------- initialise THAT to point at m ----------------
+    push argument 0           // m
+    pop  pointer 1            // THAT = m
 
-label LOOP_START
-  // if i >= n, end loop
-  push local 0
-  push argument 1
-  lt
-  not
-  if-goto LOOP_END
+    // max ← arr[0]
+    push that 0
+    pop  local 0
 
-  // Load array[i]
-  push local 0
-  push pointer 1
-  add
-  pop pointer 1
-  push that 0
+    // i ← 1
+    push constant 1
+    pop  local 1
 
-  // Compare with max
-  push temp 0
-  gt
-  if-goto UPDATE_MAX
+    // ---------- for (i < n) ---------------------------------
+    label LOOP_START
+        // i == n ?  →  done
+        push local 1
+        push argument 1        // n
+        eq
+        if-goto LOOP_END
 
-  goto CONTINUE
+        // advance THAT to arr[i]
+        push pointer 1
+        push constant 1
+        add
+        pop  pointer 1         // ++THAT
 
-label UPDATE_MAX
-  // array[i] > max, so update max
-  push that 0
-  pop temp 0
+        // if arr[i] > max  →  max ← arr[i]
+        push that 0            // arr[i]
+        push local 0
+        gt
+        if-goto UPDATE_MAX
+        goto  INC_I
 
-label CONTINUE
-  // Restore pointer 1 to base address
-  push argument 0
-  pop pointer 1
+    label UPDATE_MAX
+        push that 0
+        pop  local 0           // max = arr[i]
 
-  // i++
-  push local 0
-  push constant 1
-  add
-  pop local 0
+    label INC_I
+        // i++
+        push local 1
+        push constant 1
+        add
+        pop  local 1
+        goto LOOP_START
 
-  goto LOOP_START
+    label LOOP_END
+        push local 0
+        return
 
-label LOOP_END
-  push temp 0
-  return
+    // ---------- n == 0  (undefined by spec, return 0) -------
+    label RETURN_ZERO
+        push constant 0
+        return
