@@ -1,76 +1,33 @@
-// -----------------------------------------------------------------
-// Mult.mul   –   returns  a = x * y
-//
-// Inputs (static)
-//   static 0   x
-//   static 1   y
-//
-// Locals
-//   0  a    – running product
-//   1  cnt  – copy of y; drives the loop (can be ±)
-//
-// Idea
-//   while (cnt != 0)
-//        if cnt > 0 : a += x , cnt--
-//        else        : a -= x , cnt++
-//
-// This avoids taking |y|, so it also works for y = –32768.
-// -----------------------------------------------------------------
+// Mult.vm
+// Initialize a to 0
+@a
+M=0
 
-function Mult.mul 2          // 2 locals: a, cnt
+// Load x into D
+@x
+D=M
 
-    // a ← 0
-    push constant 0
-    pop  local 0
+// Load y into R1
+@y
+D=D-M
+@END
+D;JLE  // If y <= 0, jump to END
 
-    // cnt ← y       (copy of static 1)
-    push static 1
-    pop  local 1
+@R1
+M=D
 
-    // --------------- main loop -------------------------------
-    label LOOP_START
-        // if cnt == 0 → done
-        push local 1
-        push constant 0
-        eq
-        if-goto LOOP_END
+// Loop to add x to a, y times
+(LOOP)
+@x
+D=M
 
-        // if cnt < 0 ?
-        push local 1
-        push constant 0
-        lt
-        if-goto CNT_NEG
+@a
+M=D+M
 
-    // ------- cnt > 0  ---------------------------------------
-        // a = a + x
-        push local 0
-        push static 0
-        add
-        pop  local 0
+@R1
+M=M-1
+D=M
+@LOOP
+D;JGT  // If R1 > 0, jump to LOOP
 
-        // cnt--
-        push local 1
-        push constant 1
-        sub
-        pop  local 1
-        goto LOOP_START
-
-    // ------- cnt < 0  ---------------------------------------
-    label CNT_NEG
-        // a = a - x
-        push local 0
-        push static 0
-        sub
-        pop  local 0
-
-        // cnt++
-        push local 1
-        push constant 1
-        add
-        pop  local 1
-        goto LOOP_START
-
-    // --------------- finish ----------------------------------
-    label LOOP_END
-        push local 0      // return a
-        return
+(END)
