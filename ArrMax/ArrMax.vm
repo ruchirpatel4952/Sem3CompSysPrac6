@@ -1,74 +1,86 @@
 // -------------------------------------------------------------
 // ArrMax.arrMax(m, n)
-//   m : base address of the array   (argument 0)
-//   n : number of elements          (argument 1)
-//   returns: the largest element
+//   m : base address  (argument 0)
+//   n : length        (argument 1)
+//   returns the largest element of the array
 //
-// Implementation notes
-//   • We point THAT at m (via pointer 1) so we can read the array
-//     with   push that 0
-//   • locals[0]  – current maximum
-//     locals[1]  – loop index i   (starts at 1 because max ← arr[0])
+// Locals
+//   0  max       – running maximum
+//   1  i         – loop counter (starts at 1)
+//   2  basePtr   – keeps m so we can restore THAT later (optional)
+//   3  oldThat   – original THAT value on entry (must restore!)
 // -------------------------------------------------------------
 
-function ArrMax.arrMax 2      // 2 locals: max, i
+function ArrMax.arrMax 4     // 4 locals declared
 
-    // ---------- handle n == 0  (defensive, not required) ----
-    push argument 1
-    push constant 0
+// ---------- save caller’s THAT so we can restore it ----------
+push pointer 1
+pop  local 3        // oldThat  ←  THAT
+
+// ---------- basePtr = m ; THAT = m ---------------------------
+push argument 0
+pop  local 2        // basePtr  ←  m
+push local 2
+pop  pointer 1      // THAT     ←  m
+
+// ---------- handle n == 0 (undefined; we’ll return 0) --------
+push argument 1
+push constant 0
+eq
+if-goto ZERO_LEN
+
+// ---------- initial max = arr[0] -----------------------------
+push that 0
+pop  local 0        // max ← arr[0]
+
+push constant 1
+pop  local 1        // i   ← 1
+
+// ---------- main loop: while (i < n) -------------------------
+label LOOP_START
+    // i == n ?
+    push local 1
+    push argument 1   // n
     eq
-    if-goto RETURN_ZERO
+    if-goto LOOP_END
 
-    // ---------- initialise THAT to point at m ----------------
-    push argument 0           // m
-    pop  pointer 1            // THAT = m
-
-    // max ← arr[0]
-    push that 0
-    pop  local 0
-
-    // i ← 1
+    // advance THAT to arr[i]
+    push pointer 1
     push constant 1
+    add
+    pop  pointer 1
+
+    // if arr[i] > max  →  max = arr[i]
+    push that 0        // arr[i]
+    push local 0       // max
+    gt
+    if-goto UPDATE_MAX
+    goto  INC_I
+
+label UPDATE_MAX
+    push that 0
+    pop  local 0       // max ← arr[i]
+
+label INC_I
+    // i++
+    push local 1
+    push constant 1
+    add
     pop  local 1
+    goto LOOP_START
 
-    // ---------- for (i < n) ---------------------------------
-    label LOOP_START
-        // i == n ?  →  done
-        push local 1
-        push argument 1        // n
-        eq
-        if-goto LOOP_END
+label LOOP_END
+    // ---------- restore caller’s THAT ------------------------
+    push local 3
+    pop  pointer 1
 
-        // advance THAT to arr[i]
-        push pointer 1
-        push constant 1
-        add
-        pop  pointer 1         // ++THAT
+    // return max
+    push local 0
+    return
 
-        // if arr[i] > max  →  max ← arr[i]
-        push that 0            // arr[i]
-        push local 0
-        gt
-        if-goto UPDATE_MAX
-        goto  INC_I
-
-    label UPDATE_MAX
-        push that 0
-        pop  local 0           // max = arr[i]
-
-    label INC_I
-        // i++
-        push local 1
-        push constant 1
-        add
-        pop  local 1
-        goto LOOP_START
-
-    label LOOP_END
-        push local 0
-        return
-
-    // ---------- n == 0  (undefined by spec, return 0) -------
-    label RETURN_ZERO
-        push constant 0
-        return
+// ---------- special-case: empty array ------------------------
+label ZERO_LEN
+    push local 3
+    pop  pointer 1     // restore THAT
+    push constant 0
+    return
