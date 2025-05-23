@@ -1,4 +1,11 @@
 // AddSub.vm
+// Initialize a and b as local variables
+@a
+M=0
+
+@b
+M=0
+
 // Load a into D
 @a
 D=M
