@@ -11,6 +11,3 @@ STORE x
 
 label END
 goto END
-
-label END
-goto END
