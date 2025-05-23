@@ -1,50 +1,119 @@
 // ------------------------------------------------------------
-// Mult.vm
-//   Computes  a = x * y
+// Mult.vm   —  computes  a = x * y
 //
-//   Inputs (supplied by the test-harness):
-//     static 0   x
-//     static 1   y
+// Inputs
+//      static 0   x
+//      static 1   y
 //
-//   Locals:
-//     local 0   a  (running product)
-//     local 1   i  (loop counter)
+// Locals
+//      0   a          (running product)
+//      1   cnt        (abs(y) – loop counter)
+//      2   sx         (sign bit of x : 0 / 1)
+//      3   sy         (sign bit of y : 0 / 1)
+//      4   sneg       (1 if result should be negative, else 0)
 //
-//   Returns the product as the function’s return value as well.
+// No built-in Math.multiply is used.
+// The function returns the product (so the test harness can see it).
 // ------------------------------------------------------------
 
-function Mult.mul 2        // product & loop-counter
+function Mult.mul 5          // 5 locals declared
 
-    // ----- initialise ---------------------------------------
-    push constant 0        // a ← 0
+// ---------- initialise --------------------------------------
+push constant 0
+pop   local 0                // a ← 0
+push constant 0
+pop   local 2                // sx ← 0
+pop   local 3                // sy ← 0
+pop   local 4                // sneg ← 0   (will be set later)
+
+// ---------- |x|  and sign(x) --------------------------------
+push static 0                // x
+push constant 0
+lt                           // x < 0 ?
+if-goto X_NEG
+    // x ≥ 0
+    push static 0
+    pop   temp 0             // |x|
+    goto  CHECK_Y
+label X_NEG
+    push constant 1
+    pop   local 2            // sx ← 1
+    push static 0
+    neg                      // |x|
+    pop   temp 0
+label CHECK_Y
+
+// ---------- |y|  and sign(y) --------------------------------
+push static 1                // y
+push constant 0
+lt                           // y < 0 ?
+if-goto Y_NEG
+    // y ≥ 0
+    push static 1
+    pop   temp 1             // |y|
+    goto  SIGN_FLAG
+label Y_NEG
+    push constant 1
+    pop   local 3            // sy ← 1
+    push static 1
+    neg                      // |y|
+    pop   temp 1
+label SIGN_FLAG
+
+// ---------- result sign : sx XOR sy -------------------------
+push local 2
+push local 3
+add                          // 0,1,2
+push constant 1
+eq                           // -1 ↔ XOR true
+if-goto NEG_RESULT
+    // positive product
+    push constant 0
+    pop   local 4
+    goto  INIT_LOOP
+label NEG_RESULT
+    push constant 1
+    pop   local 4            // sneg ← 1
+label INIT_LOOP
+
+// ---------- cnt ← |y| ---------------------------------------
+push temp 1
+pop  local 1
+
+// ---------- repeated-addition loop --------------------------
+label LOOP_START
+    push local 1
+    push constant 0
+    eq                      // cnt == 0 ?
+    if-goto LOOP_END
+
+    // a = a + |x|
+    push local 0
+    push temp 0
+    add
     pop  local 0
 
-    push static 1          // i ← y   (don’t destroy static 1)
+    // cnt--
+    push local 1
+    push constant 1
+    sub
     pop  local 1
 
-    // ----- repeated-addition loop ---------------------------
-    // while (i > 0) { a += x ; i-- }
-    label LOOP_START
-        push local 1
-        push constant 0
-        eq
-        if-goto LOOP_END    // i == 0 ? break
+    goto LOOP_START
+label LOOP_END
 
-        // a = a + x
-        push local 0
-        push static 0
-        add                 // a + x
-        pop  local 0
+// ---------- apply sign if needed ----------------------------
+push local 4                 // sneg ?
+push constant 0
+eq
+if-goto RETURN_RESULT        // 0 → already positive
 
-        // i--
-        push local 1
-        push constant 1
-        sub
-        pop  local 1
-
-        goto LOOP_START
-    label LOOP_END
-
-    // ----- return a ----------------------------------------
+    // negate the product
     push local 0
-    return
+    neg
+    pop  local 0
+label RETURN_RESULT
+
+// ---------- return value ------------------------------------
+push local 0                 // a
+return
