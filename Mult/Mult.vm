@@ -3,16 +3,15 @@
 @a
 M=0
 
-// Load x into D
-@x
+// Load y into D
+@y
 D=M
 
-// Load y into R1
-@y
-D=D-M
+// If y <= 0, jump to END
 @END
-D;JLE  // If y <= 0, jump to END
+D;JLE
 
+// Initialize a counter for the loop
 @R1
 M=D
 
@@ -27,6 +26,7 @@ M=D+M
 @R1
 M=M-1
 D=M
+
 @LOOP
 D;JGT  // If R1 > 0, jump to LOOP
 
