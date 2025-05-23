@@ -1,3 +1,0 @@
-// pushTest01.vm
-push constant 10
-push local 0

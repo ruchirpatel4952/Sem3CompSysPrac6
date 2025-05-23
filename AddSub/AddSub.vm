@@ -14,5 +14,4 @@ function AddSub.calc 0   // <-- VM function header
     sub                  // (a + b) - x
 
     pop  static 0        // store result back in x
-    push static 0        // leave it on the stack as return value
     return
