@@ -1,33 +1,63 @@
-// Mult.vm
-// Initialize a to 0
-@a
-M=0
+// -------------------------------------------------------------
+// Mult.mul
+//   x -> static 0     (supplied by the test)
+//   y -> static 1
+//   returns x*y on the stack            (also leaves it in local 0)
+//
+// Locals
+//   0  a     running product
+//   1  cnt   copy of y (can be + or -)  --> loop drives toward 0
+// -------------------------------------------------------------
 
-// Load y into D
-@y
-D=M
+function Mult.mul 2          // a, cnt
 
-// If y <= 0, jump to END
-@END
-D;JLE
+    // a = 0
+    push constant 0
+    pop  local 0
 
-// Initialize a counter for the loop
-@R1
-M=D
+    // cnt = y
+    push static 1
+    pop  local 1
 
-// Loop to add x to a, y times
-(LOOP)
-@x
-D=M
+    // ------------- while (cnt != 0) --------------------------
+    label LOOP_START
+        push local 1
+        push constant 0
+        eq
+        if-goto LOOP_END      // done when cnt == 0
 
-@a
-M=D+M
+        // if cnt < 0  ?
+        push local 1
+        push constant 0
+        lt
+        if-goto CNT_NEG
 
-@R1
-M=M-1
-D=M
+        // -------- cnt > 0 --------  a = a + x ; cnt--
+        push local 0
+        push static 0
+        add
+        pop  local 0
 
-@LOOP
-D;JGT  // If R1 > 0, jump to LOOP
+        push local 1
+        push constant 1
+        sub
+        pop  local 1
+        goto LOOP_START
 
-(END)
+    // -------- cnt < 0 --------  a = a - x ; cnt++
+    label CNT_NEG
+        push local 0
+        push static 0
+        sub
+        pop  local 0
+
+        push local 1
+        push constant 1
+        add
+        pop  local 1
+        goto LOOP_START
+
+    // ------------- finish -----------------------------------
+    label LOOP_END
+        push local 0          // return value
+        return

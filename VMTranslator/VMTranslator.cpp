@@ -33,9 +33,12 @@ string VMTranslator::vm_push(string segment, int index) {
         out << '@' << (5 + index) << '\n' << "D=M\n";
     } else if (segment == "pointer") {                /* ---- pointer ---- */
         out << '@' << (3 + index) << '\n' << "D=M\n";
-    } else if (segment == "static") {                 /* ---- static ---- */
-        out << "@Static." << index << '\n' << "D=M\n";   // «Static» prefix is fine
     }
+    else if (segment == "static") {
+    out << '@' << "Static" << '.' << index << '\n'   // <── change here
+        << "D=M\n";
+    }
+
 
     /* push D */
     out << "@SP\nA=M\nM=D\n@SP\nM=M+1";
@@ -62,9 +65,11 @@ string VMTranslator::vm_pop(string segment, int index) {
     } else if (segment == "pointer") {                        /* pointer */
         out << "@SP\nAM=M-1\nD=M\n"
             << '@' << (3 + index) << '\n' << "M=D\n";
-    } else if (segment == "static") {                         /* static */
-        out << "@SP\nAM=M-1\nD=M\n"
-            << "@Static." << index << '\n' << "M=D\n";
+    }       
+    else if (segment == "static") {
+    out << "@SP\nAM=M-1\nD=M\n"
+        << '@' << "Static" << '.' << index << '\n'   // <── and here
+        << "M=D\n";
     }
     return out.str();
 }
