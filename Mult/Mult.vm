@@ -1,21 +1,25 @@
-// -------------------------------------------------------------
-// Mult.mul
-//   x -> static 0     (supplied by the test)
-//   y -> static 1
-//   returns x*y on the stack            (also leaves it in local 0)
+// --------------------------------------------------------------
+// Mult.mult        --  computes a = x * y
+//
+// Inputs (supplied by the test harness)
+//   static 0   x
+//   static 1   y
 //
 // Locals
-//   0  a     running product
-//   1  cnt   copy of y (can be + or -)  --> loop drives toward 0
-// -------------------------------------------------------------
+//   0   a     (running product)
+//   1   cnt   (copy of y; may be ±)
+//
+// Returns
+//   the product on top of the stack
+// --------------------------------------------------------------
 
-function Mult.mul 2          // a, cnt
+function Mult.mult 2      // 2 locals: a, cnt
 
-    // a = 0
+    // a ← 0
     push constant 0
-    pop  local 0
+    pop   local 0
 
-    // cnt = y
+    // cnt ← y
     push static 1
     pop  local 1
 
@@ -23,41 +27,45 @@ function Mult.mul 2          // a, cnt
     label LOOP_START
         push local 1
         push constant 0
-        eq
-        if-goto LOOP_END      // done when cnt == 0
+        eq                    // cnt == 0 ?
+        if-goto LOOP_END
 
-        // if cnt < 0  ?
+        // cnt < 0 ?
         push local 1
         push constant 0
         lt
         if-goto CNT_NEG
 
-        // -------- cnt > 0 --------  a = a + x ; cnt--
+        // ----- cnt  > 0  -----
+        // a = a + x
         push local 0
         push static 0
         add
         pop  local 0
 
+        // cnt--
         push local 1
         push constant 1
         sub
         pop  local 1
         goto LOOP_START
 
-    // -------- cnt < 0 --------  a = a - x ; cnt++
+    // ----- cnt  < 0  -----
     label CNT_NEG
+        // a = a - x
         push local 0
         push static 0
         sub
         pop  local 0
 
+        // cnt++
         push local 1
         push constant 1
         add
         pop  local 1
         goto LOOP_START
 
-    // ------------- finish -----------------------------------
+    // ------------- done --------------------------------------
     label LOOP_END
-        push local 0          // return value
+        push local 0          // return a
         return
