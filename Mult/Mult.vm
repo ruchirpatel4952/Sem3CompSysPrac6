@@ -1,71 +1,43 @@
-// --------------------------------------------------------------
-// Mult.mult        --  computes a = x * y
-//
-// Inputs (supplied by the test harness)
-//   static 0   x
-//   static 1   y
-//
-// Locals
-//   0   a     (running product)
-//   1   cnt   (copy of y; may be ±)
-//
-// Returns
-//   the product on top of the stack
-// --------------------------------------------------------------
+// Mult.vm
+// Calculates a = x * y using repeated addition
+// x = static 0
+// y = static 1
+// a = local 0
 
-function Mult.mult 2      // 2 locals: a, cnt
+// Initialize a = 0
+push constant 0
+pop local 0
 
-    // a ← 0
-    push constant 0
-    pop   local 0
+// Load y (multiplier) into temp 0
+push static 1
+pop temp 0
 
-    // cnt ← y
-    push static 1
-    pop  local 1
+// Load x (multiplicand) into temp 1
+push static 0
+pop temp 1
 
-    // ------------- while (cnt != 0) --------------------------
-    label LOOP_START
-        push local 1
-        push constant 0
-        eq                    // cnt == 0 ?
-        if-goto LOOP_END
+label LOOP_START
+// if temp 0 == 0, we're done
+push temp 0
+push constant 0
+eq
+if-goto LOOP_END
 
-        // cnt < 0 ?
-        push local 1
-        push constant 0
-        lt
-        if-goto CNT_NEG
+// a = a + x (temp1)
+push local 0
+push temp 1
+add
+pop local 0
 
-        // ----- cnt  > 0  -----
-        // a = a + x
-        push local 0
-        push static 0
-        add
-        pop  local 0
+// temp0 = temp0 - 1
+push temp 0
+push constant 1
+sub
+pop temp 0
 
-        // cnt--
-        push local 1
-        push constant 1
-        sub
-        pop  local 1
-        goto LOOP_START
+goto LOOP_START
 
-    // ----- cnt  < 0  -----
-    label CNT_NEG
-        // a = a - x
-        push local 0
-        push static 0
-        sub
-        pop  local 0
+label LOOP_END
 
-        // cnt++
-        push local 1
-        push constant 1
-        add
-        pop  local 1
-        goto LOOP_START
-
-    // ------------- done --------------------------------------
-    label LOOP_END
-        push local 0          // return a
-        return
+label END
+goto END

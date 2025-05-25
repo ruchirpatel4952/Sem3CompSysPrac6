@@ -109,9 +109,19 @@ string VMTranslator::vm_lt() { return two_arg_cmp("JLT"); }
 /*     F L O W   C O N T R O L                                */
 /* ─────────────────────────────────────────────────────────── */
 
-string VMTranslator::vm_label(string label)       { return "(" + label + ")"; }
-string VMTranslator::vm_goto (string label)       { return "@" + label + "\n0;JMP"; }
-string VMTranslator::vm_if   (string label) {
+string VMTranslator::vm_label(string label)       { 
+    return "(" + CURRENT_FUNC + '$' + label + ')';
+    return "(" + label + ")"; }
+string VMTranslator::vm_goto (string label)       { 
+    return '@' + CURRENT_FUNC + '$' + label + "\n0;JMP";
+    return "@" + label + "\n0;JMP"; }
+
+string VMTranslator::vm_if   (const string& label)
+{
+    ostringstream out;
+    out << "@SP\nAM=M-1\nD=M\n@"
+        << CURRENT_FUNC << '$' << label << "\nD;JNE";
+    return out.str();
     ostringstream out;
     out << "@SP\nAM=M-1\nD=M\n@" << label << '\n' << "D;JNE";
     return out.str();
@@ -121,8 +131,8 @@ string VMTranslator::vm_if   (string label) {
 /*   Simple function support (enough for basic tests)          */
 /* ─────────────────────────────────────────────────────────── */
 
-string VMTranslator::vm_function(string name, int nVars)
-{
+string VMTranslator::vm_function(string name, int nVars) {
+    CURRENT_FUNC = name;
     ostringstream out;
     out << '(' << name << ")\n";
     for (int i = 0; i < nVars; ++i)
@@ -191,3 +201,10 @@ string VMTranslator::vm_return()
 
 VMTranslator::VMTranslator()  = default;
 VMTranslator::~VMTranslator() = default;
+
+/* 1 ── keep track of the innermost function name ──────────── */
+static std::string CURRENT_FUNC = "";
+
+
+
+
