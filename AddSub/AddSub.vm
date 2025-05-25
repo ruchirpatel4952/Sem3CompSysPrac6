@@ -4,7 +4,7 @@
 //   b → local 1
 //   x → static 0
 
-function AddSub.calc 0   // <-- VM function header
+function AddSub.calc 2   // ← 2 locals: local 0 = a, local 1 = b
 
     push local 0         // a
     push local 1         // b
