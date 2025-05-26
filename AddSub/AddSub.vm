@@ -1,17 +1,22 @@
-// AddSub.vm
-// calculates  x = (a + b) - x
-//   a → local 0
-//   b → local 1
-//   x → static 0
+//ADDSUB
 
-function AddSub.calc 2   // ← 2 locals: local 0 = a, local 1 = b
+// Push a (local 0)
+    push local 0
 
-    push local 0         // a
-    push local 1         // b
-    add                  // a + b
+// Push b (local 1)
+    push local 1
 
-    push static 0        // x
-    sub                  // (a + b) - x
+// Add a + b
+    add
 
-    pop  static 0        // store result back in x
-    return
+// Push x (static 0)
+    push static 0
+
+// Subtract: (a + b) - x
+    sub
+
+// Store result in static 0 (x)
+    pop static 0
+
+label END
+goto END

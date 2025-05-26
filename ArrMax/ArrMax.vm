@@ -1,15 +1,4 @@
-// -------------------------------------------------------------
-// ArrMax.arrMax(m, n)
-//   m : base address  (argument 0)
-//   n : length        (argument 1)
-//   returns the largest element of the array
-//
-// Locals
-//   0  max       – running maximum
-//   1  i         – loop counter (starts at 1)
-//   2  basePtr   – keeps m so we can restore THAT later (optional)
-//   3  oldThat   – original THAT value on entry (must restore!)
-// -------------------------------------------------------------
+//ARRMAX
 
 function ArrMax.arrMax 4     // 4 locals declared
 
