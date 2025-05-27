@@ -1,37 +1,98 @@
-// Initialize a = 0
-    push constant 0
-    pop local 0
+// Init result = 0
+push constant 0
+pop local 0
 
-// Load y (multiplier) into temp 0
-    push static 1
-    pop temp 0
+// Load x and y
+push static 0
+pop temp 1       // x
+push static 1
+pop temp 0       // y
 
-// Load x (multiplicand) into temp 1
-    push static 0
-    pop temp 1
+// Get sign of x
+push temp 1
+push constant 0
+lt
+if-goto X_NEG
+push constant 0
+goto X_SIGN_DONE
+label X_NEG
+push constant 1
+label X_SIGN_DONE
+pop temp 2       // signX
 
+// Get sign of y
+push temp 0
+push constant 0
+lt
+if-goto Y_NEG
+push constant 0
+goto Y_SIGN_DONE
+label Y_NEG
+push constant 1
+label Y_SIGN_DONE
+pop temp 3       // signY
+
+// abs(x)
+push temp 1
+push constant 0
+lt
+if-goto ABS_X
+goto ABS_X_DONE
+label ABS_X
+push temp 1
+neg
+pop temp 1
+label ABS_X_DONE
+
+// abs(y)
+push temp 0
+push constant 0
+lt
+if-goto ABS_Y
+goto ABS_Y_DONE
+label ABS_Y
+push temp 0
+neg
+pop temp 0
+label ABS_Y_DONE
+
+// Determine if result should be negated: signX XOR signY
+push temp 2
+push temp 3
+xor
+pop temp 4       // 1 if result must be negated
+
+// Loop: a = a + x (temp 1), y times (temp 0)
 label LOOP_START
-// if temp 0 == 0, we're done 
-    push temp 0
-    push constant 0
-    eq
-    if-goto LOOP_END
+push temp 0
+push constant 0
+eq
+if-goto LOOP_END
 
-// a = a + x (temp1)
-    push local 0
-    push temp 1
-    add
-    pop local 0
+push local 0
+push temp 1
+add
+pop local 0
 
-// temp0 = temp0 - 1
-    push temp 0
-    push constant 1
-    sub
-    pop temp 0
+push temp 0
+push constant 1
+sub
+pop temp 0
 
 goto LOOP_START
-
 label LOOP_END
+
+// Negate result if needed
+push temp 4
+push constant 1
+eq
+if-goto NEGATE_RESULT
+goto DONE
+label NEGATE_RESULT
+push local 0
+neg
+pop local 0
+label DONE
 
 label END
 goto END
