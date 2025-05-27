@@ -57,10 +57,21 @@ pop temp 0
 label ABS_Y_DONE
 
 // Determine if result should be negated: signX XOR signY
+// temp 2 = signX
+// temp 3 = signY
+
 push temp 2
+not
 push temp 3
-xor
-pop temp 4       // 1 if result must be negated
+and
+
+push temp 3
+not
+push temp 2
+and
+
+or
+pop temp 4  // negateResultFlag = signX XOR signY
 
 // Loop: a = a + x (temp 1), y times (temp 0)
 label LOOP_START
