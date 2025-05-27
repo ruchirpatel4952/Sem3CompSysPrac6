@@ -1,4 +1,4 @@
-load Abs.vm,
+load Sys.vm,
 output-file Abs01.out,
 compare-to Abs01.cmp,
 output-list RAM[17]%D1.6.1;
