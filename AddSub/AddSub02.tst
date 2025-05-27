@@ -1,23 +1,29 @@
-// AddSub01.tst
-// Test case 2: a = 10, b = 4, x = 7
-@10
-D=A
-@a
-M=D
+// AddSub02.tst
 
-@4
-D=A
-@b
-M=D
+load AddSub.vm,
+output-file AddSub02.out,
+compare-to AddSub02.cmp,
+output-list sp%D1.6.1 local%D1.6.1 argument%D1.8.1 this%D1.6.1 that%D1.6.1
+            RAM[16]%D1.6.1 RAM[17]%D1.6.1 RAM[18]%D1.6.1
+            local[0]%D1.8.1 local[1]%D1.8.1 local[2]%D1.8.1
+            argument[0]%D1.11.1 argument[1]%D1.11.1 argument[2]%D1.11.1;
 
-@7
-D=A
-@x
-M=D
+set sp 256,
+set local 300,
+set argument 400,
+set this 3000,
+set that 3010,
 
-@AddSub.vm
-0;JMP
+set RAM[16] 7,   // static 0
+set RAM[17] 8,   // static 1
+set RAM[18] 9,   // static 2
 
-(END)
-@END
-0;JMP
+set local[0] 100,
+set local[1] 200,
+set local[2] 300,
+
+set argument[0] 1000,
+set argument[1] 2000,
+set argument[2] 3000,
+
+run;
