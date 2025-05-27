@@ -5,5 +5,10 @@ output-list RAM[300]%D1.6.1;
 
 set sp 256,
 set local 300,
-set static 0 7,      // multiplicand (x)
-set static 1 3,      // multiplier (y)
+set static 0 7,
+set static 1 3,
+
+repeat 100 {
+  vmstep;
+}
+output;
