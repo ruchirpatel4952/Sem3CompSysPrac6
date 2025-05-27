@@ -1,5 +1,8 @@
 // Main.vm
-// Main entry point for the VM programs
+// Main entry point for testing Abs.abs
 
 function Main.main 0
-call Abs.main 0
+push constant 7     // test input (x = 7)
+call Abs.abs 1
+pop temp 0          // discard result or inspect later
+return
