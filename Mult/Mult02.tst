@@ -1,18 +1,9 @@
-// Mult01.tst
-// Test case 2: x = 5, y = 0
-@5
-D=A
-@x
-M=D
+load Mult.vm,
+output-file Mult02.out,
+compare-to Mult02.cmp,
+output-list RAM[300]%D1.6.1;
 
-@0
-D=A
-@y
-M=D
-
-@Mult.vm
-0;JMP
-
-(END)
-@END
-0;JMP
+set sp 256,
+set local 300,
+set static 0 7,      // multiplicand (x)
+set static 1 3,      // multiplier (y)

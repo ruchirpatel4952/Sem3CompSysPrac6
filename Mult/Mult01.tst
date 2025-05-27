@@ -1,18 +1,9 @@
-// Mult00.tst
-// Test case 1: x = 2, y = 3
-@2
-D=A
-@x
-M=D
+load Mult.vm,
+output-file Mult01.out,
+compare-to Mult01.cmp,
+output-list RAM[300]%D1.6.1;     // local 0 will be at RAM[300]
 
-@3
-D=A
-@y
-M=D
-
-@Mult.vm
-0;JMP
-
-(END)
-@END
-0;JMP
+set sp 256,
+set local 300,
+set static 0 6,      // x = 6
+set static 1 5,      // y = 5
